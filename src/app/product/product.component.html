@@ -4,3 +4,34 @@
 <button (click)="setProduct()">Set a Product</button>
 <button (click)="clearProduct()">Clear Defautl Product</button>
 mycheck <input type="checkbox" (change)="onChangeCheck()">
+<!--
+<div>
+  {{(products$ | async) | json}}
+</div> -->
+<hr>
+
+<div>
+  {{this.selectedId$ | async}}
+</div>
+<hr>
+
+<div>
+
+  <div *ngIf="this.selectedProduct$ | async as product">
+    <input id="productName" type="text" placeholder="product name" [value]="product.productName">
+
+    <input id="productCode" type="text" placeholder="product code" [value]="product.productCode">
+
+    <button (click)="updateProduct(product.id)">Actualizar</button>
+
+  </div>
+  SELECCIONADO: {{this.selectedProduct$ | async | json}}
+
+
+</div>
+<hr>
+<ul *ngIf="products$ | async as products">
+  <li *ngFor="let product of products">
+    {{product | json}} <button (click)="selectProduct( product.id)"> select</button>
+  </li>
+</ul>

@@ -1,9 +1,10 @@
+import { Product } from './state/product.model';
 import { AppState } from './../state/app.state';
 import { Observable } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import * as ProductActions from './state/product.actions';
-import { getProductShowCode } from "./state/product.reducer";
+import { getProductShowCode, getProducts, getSelectedId, getSelectedProduct } from "./state/product.reducer";
 
 @Component({
   selector: 'app-product',
@@ -12,14 +13,24 @@ import { getProductShowCode } from "./state/product.reducer";
 })
 export class ProductComponent implements OnInit {
 
-  public product$: Observable<any>;
+  public products$: Observable<Array<Product>>;
+
+  public selectedId$: Observable<number>;
+
+  public selectedProduct$: Observable<Product>;
 
   constructor(private store: Store<AppState>) { }
 
   ngOnInit(): void {
+    this.products$ = this.store.select(getProducts);
+
+    this.selectedId$ = this.store.select(getSelectedId);
+
+    this.selectedProduct$ = this.store.select(getSelectedProduct);
+
     this.store.dispatch(ProductActions.loadProduct());
 
-    this.product$ = this.store.select("product");
+
   }
 
 
@@ -34,16 +45,9 @@ export class ProductComponent implements OnInit {
   }
 
 
-  private selectProduct() {
-    console.log("Aqui inicia la subs");
-    // this.store.pipe(select('product' as any)).subscribe(product => {
-    //   console.log("Suscrito a producto tenemos datos", product);
-    // });
-
-    this.store.select(getProductShowCode).subscribe(showProductCode => {
-
-      console.log("Ser recibió el producto code", showProductCode);
-    })
+  public selectProduct(id: number) {
+    console.log("Cambiando  propiedad id", id);
+    this.store.dispatch(ProductActions.setSelectedProductId({ id }));
   }
 
   public onChangeCheck(): void {
@@ -52,4 +56,17 @@ export class ProductComponent implements OnInit {
     this.store.dispatch(ProductActions.tootleProductCode());
     //console.log("Aqui ya se inició el dispatch pero no hizo nada")
   }
+
+  public updateProduct(id: number) {
+    console.log("Actualizando ", id);
+    const productName = document.getElementById("productName") as HTMLInputElement;
+    const productCode = document.getElementById("productCode") as HTMLInputElement;
+    const updatedProduct: Product = { id, productCode: productCode.value, productName: productName.value };
+    console.log(updatedProduct,"products", productName.value, productCode.value);
+
+    this.store.dispatch(ProductActions.updateProduct({ product: updatedProduct }));
+
+    // console.log("update component");
+  }
+
 }
